@@ -43,7 +43,7 @@ bot.on('message', (message) => {
         }
     }
     else if (message.content == '/commands') {
-        message.reply('List of commands for this bot:\n\nFor everyone\'s use:\n`/status` - Check the status of the bot (enabled/disabled)\n\nFor MC\'s use:\n`/night` - Mute everyone except MC (as night falls)\n`/day` - Unmute everyone except those who are dead (assigned @Dead role)\n`/vote` - creates a vote menu in #voting\n`/removeroles` - Remove roles 1-12號 and dead from all members');
+        message.reply('List of commands for this bot:\n\nFor everyone\'s use:\n`/status` - Check the status of the bot (enabled/disabled)\n`/ping` - pings @Active WW member 5 times (please do not abuse or you will lose access to this command)\n\nFor MC\'s use:\n`/night` - Mute everyone except MC (as night falls)\n`/day` - Unmute everyone except those who are dead (assigned @Dead role)\n`/vote` - creates a vote menu in #voting\n`/removeroles` - Remove roles 1-12號 and dead from all members');
     }
     else if (message.content == '/night' && status == 1) {
         let allowedRole = message.guild.roles.find(role => role.name === "MC");
@@ -114,5 +114,12 @@ bot.on('message', (message) => {
            message.reply('You are not allowed to use this command. ||GFY!||');
         }
     }
+    if (message.content == '/ping') {
+        message.channel.send("<@&668003114858577920>");
+        message.channel.send("<@&668003114858577920>");
+        message.channel.send("<@&668003114858577920>");
+        message.channel.send("<@&668003114858577920>");
+        message.channel.send("<@&668003114858577920>");
+    }
 });
-bot.login('NjUzOTY4ODg1NzIwMjg1MjA0.Xe-2AA.yaD5OJ6w7Wy5dNA9vZEJ7Sic3xQ');
+bot.login('NjUzOTY4ODg1NzIwMjg1MjA0.XkTppQ._C_WYVGyhO9EXtfQzYqaLmsQ_P4');
