@@ -430,7 +430,7 @@ bot.on('message', (message) => {
                 bot.channels.get('644812476382445569').send(votemsg);
             }
             else {
-                var votemsg = '🗳️投票結束！<@&'+convert2(vi)+'>號淘汰\n\n__投票結果：__\n';
+                var votemsg = '🗳️投票結束！<@&'+convert2(vi)+'>淘汰\n\n__投票結果：__\n';
                 for (var i = 0; i <= players; i++) {
                     var hasVotes = 0;
                     var templist = [];
