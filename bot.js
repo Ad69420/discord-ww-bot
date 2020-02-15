@@ -7,9 +7,11 @@ var dead = [-1, -1, -1];
 var day = 0;
 var daycnt = 0;
 var wolves = [];
-var msgid, msgid2;
+var msgid, msgid2, msgid3, msgid4;
 var witch;
-var witchchannel, seerchannel;
+var hunter;
+var wolfking;
+var witchchannel, seerchannel, hunterchannel, wkchannel;
 var players;
 const events = {
 	MESSAGE_REACTION_ADD: 'messageReactionAdd'
@@ -109,6 +111,9 @@ bot.on('message', (message) => {
                 var rolelist = messages2.first().toString();
                 var windex = rolelist.indexOf('witch');
                 var sindex = rolelist.indexOf('seer');
+                var hindex = rolelist.indexOf('hunter');
+                var wkindex = rolelist.indexOf('wolf king');
+                console.log('Wkindex:'+wkindex);
                 var flag = 1;
                 while (windex--) {
                     if (flag == 0) break;
@@ -124,6 +129,7 @@ bot.on('message', (message) => {
                             }
                             else if (tempr == 0) {
                                 witchchannel = convert4(parseInt(rolelist.substr(tempr, 2))).toString();
+                                witch = parseInt(rolelist.substr(tempr, 3));
                                 console.log('Witchchannel:'+witchchannel);
                                 flag = 0;
                                 break;
@@ -146,6 +152,48 @@ bot.on('message', (message) => {
                             else if (temps == 0) {
                                 seerchannel = convert4(parseInt(rolelist.substr(temps, 2))).toString();
                                 console.log('Seerchannel:'+seerchannel);
+                                flag = 0;
+                                break;
+                            }
+                        }
+                    }
+                }
+                flag = 1;
+                while (hindex--) {
+                    if (flag == 0) break;
+                    if (rolelist[hindex] == '.') {
+                        var temph = hindex;
+                        while (temph--) {
+                            if (rolelist[temph] == '\n') {
+                                hunterchannel = convert4(parseInt(rolelist.substr(temph + 1, 2))).toString();
+                                hunter = parseInt(rolelist.substr(temph + 1, 3));
+                                flag = 0;
+                                break;
+                            }
+                            else if (temph == 0) {
+                                hunterchannel = convert4(parseInt(rolelist.substr(temph, 2))).toString();
+                                hunter = parseInt(rolelist.substr(temph, 3));
+                                flag = 0;
+                                break;
+                            }
+                        }
+                    }
+                }
+                flag = 1;
+                while (wkindex--) {
+                    if (flag == 0) break;
+                    if (rolelist[wkindex] == '.') {
+                        var temph = wkindex;
+                        while (temph--) {
+                            if (rolelist[temph] == '\n') {
+                                wkchannel = convert4(parseInt(rolelist.substr(temph + 1, 2))).toString();
+                                wolfking = parseInt(rolelist.substr(temph + 1, 3));
+                                flag = 0;
+                                break;
+                            }
+                            else if (temph == 0) {
+                                wkchannel = convert4(parseInt(rolelist.substr(temph, 2))).toString();
+                                wolfking = parseInt(rolelist.substr(temph, 3));
                                 flag = 0;
                                 break;
                             }
@@ -266,36 +314,46 @@ bot.on('message', (message) => {
         }
         else {
             if (dead[1] == -1 && dead[0] != -1) {
-                bot.channels.get('644812476382445569').send('<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚'+dead[0]+'號被殺死');
+                bot.channels.get('644812476382445569').send('<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚**'+dead[0]+'號**被殺死');
             }
             else if (dead[1] != -1 && dead[0] == -1) {
-                bot.channels.get('644812476382445569').send('<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚'+dead[1]+'號被殺死');
+                bot.channels.get('644812476382445569').send('<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚**'+dead[1]+'號**被殺死');
             }
             else if (dead[1] != -1 && dead[0] != -1 && dead[1] > dead[0]) {
-                bot.channels.get('644812476382445569').send('<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚'+dead[0]+'號、 '+dead[1]+'號被殺死');
+                bot.channels.get('644812476382445569').send('<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚**'+dead[0]+'號**、 **'+dead[1]+'號**被殺死');
             }
             else if (dead[1] != -1 && dead[0] != -1 && dead[1] < dead[0]) {
-                bot.channels.get('644812476382445569').send('<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚'+dead[1]+'號、 '+dead[0]+'號被殺死');
+                bot.channels.get('644812476382445569').send('<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚**'+dead[1]+'號**、 **'+dead[0]+'號**被殺死');
             }
             else if (dead[1] == dead[0] && dead[1] != -1) {
-                bot.channels.get('644812476382445569').send('<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚'+dead[0]+'號被殺死');
+                bot.channels.get('644812476382445569').send('<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚**'+dead[0]+'號**被殺死');
             }
+        }
+        if (dead[0] == hunter) {
+            bot.channels.get('644812476382445569').send('<@&'+convert2(hunter)+'> 啟動角色技能 選擇你要帶走的對象');
+            bot.channels.get(hunterchannel).send('<@&'+convert2(hunter)+'> 啟動獵人技能 選擇你要射殺的對象').then(async function (messages) {
+                msgid3 = messages.id;
+                for (var i = 1; i <= players; i++) {
+                    await messages.react(convert(i));
+                }
+                await messages.react('❌');
+            });
         }
     }
     else if (message.content == '/vote' && status == 1) {
         let MC = message.guild.roles.find(role => role.name === "MC");
         let dead = message.guild.roles.find(role => role.name === "Dead");
         if (message.member.roles.has(MC.id)) {
-            bot.channels.get('644812476382445569').send('-------------------------------\nPlease cast your vote below.').then(async function (message) {
+            bot.channels.get('644812476382445569').send('-------------------------------\nPlease cast your vote below.').then(async function (messages) {
                 for (var i = 1; i <= players; i++) {
                     //var temprole = convert2(i);
                     //message.guild.roles.get(temprole).members.forEach(async function () {
                     //    if (!member.roles.has(dead.id)) {
-                            await message.react(convert(i));
+                            await messages.react(convert(i));
                     //    }
                     //});
                 }
-                await message.react('❌');
+                await messages.react('❌');
             });
             message.reply(' ✅ Created vote menu in #voting.');
         }
@@ -492,6 +550,46 @@ bot.on('raw', async event => {
                 }
                 else {
                     channelr.fetchMessage(msgid2).then(msg => msg.delete());
+                }
+            }
+        }
+    }
+    else if (messager.id == msgid3) {
+        if (event.t === "MESSAGE_REACTION_ADD") {
+            if (messager.content.includes('射殺的') && userr.id != '653968885720285204') {
+                var targeth = convert3(emojir.toString());
+                if (targeth != -1) {
+                    channelr.fetchMessage(msgid3).then(msg => msg.delete());
+                    bot.channels.get(hunterchannel).send('✅**'+targeth+'號**已被帶走'); 
+                    bot.channels.get('644812476382445569').send('<@&'+convert2(targeth)+'>'+'淘汰');
+                    if (targeth == wolfking) {
+                        bot.channels.get('644812476382445569').send('<@&'+convert2(wolfking)+'> 啟動角色技能 選擇你要帶走的對象');
+                        bot.channels.get(wkchannel).send('<@&'+convert2(wolfking)+'> 啟動狼王技能 選擇你要帶走的對象').then(async function (messagess) {
+                            msgid4 = messagess.id;
+                            for (var i = 1; i <= players; i++) {
+                                await messagess.react(convert(i));
+                            }
+                            await messagess.react('❌');
+                        });
+                    }
+                }
+                else {
+                    channelr.fetchMessage(msgid3).then(msg => msg.delete());
+                }
+            }
+        }
+    }
+    else if (messager.id == msgid4) {
+        if (event.t === "MESSAGE_REACTION_ADD") {
+            if (messager.content.includes('帶走的') && userr.id != '653968885720285204') {
+                var targetwk = convert3(emojir.toString());
+                if (targetwk != -1) {
+                    channelr.fetchMessage(msgid4).then(msg => msg.delete());
+                    bot.channels.get(wkchannel).send('✅**'+targetwk+'號**已被帶走'); 
+                    bot.channels.get('644812476382445569').send('<@&'+convert2(targetwk)+'>'+'淘汰');
+                }
+                else {
+                    channelr.fetchMessage(msgid4).then(msg => msg.delete());
                 }
             }
         }
