@@ -390,6 +390,7 @@ bot.on('message', (message) => {
             for (var i = 1; i <= players; i++) {
                 bot.channels.get(convert4(i)).send('🗳️請投票').then(async function (messages) {
                     for (var j = 1; j <= players; j++) {
+                        if (message.guild.roles.get('644821024692764683').members.include())
                         await messages.react(convert(j));
                     }
                     await messages.react('❌');
@@ -643,7 +644,7 @@ bot.on('message', (message) => {
         message.channel.send("<@&668003114858577920>");
     }
     else if (message.content.includes('/kill') && status == 1) {
-        if (message.member.id == '653535759508439051') return;
+        if (message.member.id == '653535759508439051' || message.member.id == '677378738228559873') return;
         if (message.channel.id != '644797493476851713' || day == 1 || cankill == 0) {
             message.reply(' 🚫 Access denied.');
         }
@@ -695,7 +696,7 @@ bot.on('message', (message) => {
         }
     }
     else if (message.content.includes('/check') && status == 1) {
-        if (message.member.id == '653535759508439051') return;
+        if (message.member.id == '653535759508439051' || message.member.id == '677378738228559873') return;
         if (message.channel.id != seerchannel || checkstatus == 0 || day == 1) {
             message.reply(' 🚫 Access denied.');
         }
@@ -732,7 +733,7 @@ bot.on('message', (message) => {
         vlist = [];
     }
     else if (message.content == '/togglepoison' && status == 1) {
-        if (message.member.id == '653535759508439051') return;
+        if (message.member.id == '653535759508439051' || message.member.id == '677378738228559873') return;
         let MC = message.guild.roles.find(role => role.name === 'MC');
         if (!message.member.roles.has(MC.id)) {
             message.reply(' 🚫 Access denied.');
@@ -750,7 +751,7 @@ bot.on('message', (message) => {
         }
     }
     else if (message.content == '/togglesave' && status == 1) {
-        if (message.member.id == '653535759508439051') return;
+        if (message.member.id == '653535759508439051' || message.member.id == '677378738228559873') return;
         let MC = message.guild.roles.find(role => role.name === 'MC');
         if (!message.member.roles.has(MC.id)) {
             message.reply(' 🚫 Access denied.');
