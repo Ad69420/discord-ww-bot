@@ -7,14 +7,17 @@ var dead = [-1, -1, -1];
 var day = 0;
 var daycnt = 0;
 var wolves = [];
-var msgid, msgid2, msgid3, msgid4;
+var msgid, msgid2, msgid3, msgid4, msgid5;
 var witch;
 var hunter;
+var idiot, idiotstatus = 0, knight, knightstatus = 0;
 var vlist = [];
 var wolfking;
+var isDead = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 var vote = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], votei = [];
-var witchchannel, seerchannel, hunterchannel, wkchannel;
+var witchchannel, seerchannel, hunterchannel, wkchannel, knightchannel;
 var players;
+var endvotebool = 0, votebool = 0, revotebool = 0, endrevotebool = 0;
 const events = {
 	MESSAGE_REACTION_ADD: 'messageReactionAdd'
 };
@@ -109,9 +112,14 @@ bot.on('message', (message) => {
         day = 0;
         checkstatus = 1;
         cankill = 1;
+        dead = [-1, -1, -1];
         let allowedRole = message.guild.roles.find(role => role.name === "MC");
         if (message.member.roles.has(allowedRole.id)) {
             let channel = message.member.voiceChannel;
+            if (channel == undefined) {
+                message.reply('🚫 You have not joined a VC yet.');
+                return;
+            }
             for (let member of channel.members) {
                 if (member[1] != message.member) {
                     member[1].setMute(true);
@@ -129,6 +137,8 @@ bot.on('message', (message) => {
                 var sindex = rolelist.indexOf('seer');
                 var hindex = rolelist.indexOf('hunter');
                 var wkindex = rolelist.indexOf('wolf king');
+                var iindex = rolelist.indexOf('idiot');
+                var kindex = rolelist.indexOf('knight');
                 console.log('Wkindex:'+wkindex);
                 var flag = 1;
                 while (windex--) {
@@ -144,7 +154,7 @@ bot.on('message', (message) => {
                                 break;
                             }
                             else if (tempr == 0) {
-                                witchchannel = convert4(parseInt(rolelist.substr(tempr, 2))).toString();
+                                witchchannel = convert4(parseInt(rolelist.substr(tempr, 3))).toString();
                                 witch = parseInt(rolelist.substr(tempr, 3));
                                 console.log('Witchchannel:'+witchchannel);
                                 flag = 0;
@@ -160,13 +170,13 @@ bot.on('message', (message) => {
                         var temps = sindex;
                         while (temps--) {
                             if (rolelist[temps] == '\n') {
-                                seerchannel = convert4(parseInt(rolelist.substr(temps + 1, 2))).toString();
+                                seerchannel = convert4(parseInt(rolelist.substr(temps + 1, 3))).toString();
                                 console.log('Seerchannel:'+seerchannel);
                                 flag = 0;
                                 break;
                             }
                             else if (temps == 0) {
-                                seerchannel = convert4(parseInt(rolelist.substr(temps, 2))).toString();
+                                seerchannel = convert4(parseInt(rolelist.substr(temps, 3))).toString();
                                 console.log('Seerchannel:'+seerchannel);
                                 flag = 0;
                                 break;
@@ -182,13 +192,13 @@ bot.on('message', (message) => {
                             var temph = hindex;
                             while (temph--) {
                                 if (rolelist[temph] == '\n') {
-                                    hunterchannel = convert4(parseInt(rolelist.substr(temph + 1, 2))).toString();
+                                    hunterchannel = convert4(parseInt(rolelist.substr(temph + 1, 3))).toString();
                                     hunter = parseInt(rolelist.substr(temph + 1, 3));
                                     flag = 0;
                                     break;
                                 }
                                 else if (temph == 0) {
-                                    hunterchannel = convert4(parseInt(rolelist.substr(temph, 2))).toString();
+                                    hunterchannel = convert4(parseInt(rolelist.substr(temph, 3))).toString();
                                     hunter = parseInt(rolelist.substr(temph, 3));
                                     flag = 0;
                                     break;
@@ -205,19 +215,66 @@ bot.on('message', (message) => {
                             var tempwk = wkindex;
                             while (tempwk--) {
                                 if (rolelist[tempwk] == '\n') {
-                                    wkchannel = convert4(parseInt(rolelist.substr(tempwk + 1, 2))).toString();
+                                    wkchannel = convert4(parseInt(rolelist.substr(tempwk + 1, 3))).toString();
                                     wolfking = parseInt(rolelist.substr(tempwk + 1, 3));
                                     flag = 0;
                                     break;
                                 }
                                 else if (tempwk == 0) {
-                                    wkchannel = convert4(parseInt(rolelist.substr(tempwk, 2))).toString();
+                                    wkchannel = convert4(parseInt(rolelist.substr(tempwk, 3))).toString();
                                     wolfking = parseInt(rolelist.substr(tempwk, 3));
                                     flag = 0;
                                     break;
                                 }
                             }
                             console.log('Wolfking:' +wolfking);
+                        }
+                    }
+                }
+                flag = 1;
+                if (iindex != -1) {
+                    while (iindex--) {
+                        if (flag == 0) break;
+                        if (rolelist[iindex] == '.') {
+                            var tempi = iindex;
+                            while (tempi--) {
+                                if (rolelist[tempi] == '\n') {
+                                    idiot = parseInt(rolelist.substr(tempi + 1, 3));
+                                    flag = 0;
+                                    break;
+                                }
+                                else if (tempi == 0) {
+                                    idiot = parseInt(rolelist.substr(tempi, 3));
+                                    flag = 0;
+                                    break;
+                                }
+                            }
+                            console.log('Idiot:' +idiot);
+                        }
+                    }
+                }
+                flag = 1;
+                if (kindex != -1) {
+                    while (kindex--) {
+                        if (flag == 0) break;
+                        if (rolelist[kindex] == '.') {
+                            var tempk = kindex;
+                            while (tempk--) {
+                                if (rolelist[tempk] == '\n') {
+                                    knightchannel = convert4(parseInt(rolelist.substr(tempk, 3))).toString();
+                                    knight = parseInt(rolelist.substr(tempk + 1, 3));
+                                    flag = 0;
+                                    break;
+                                }
+                                else if (tempk == 0) {
+                                    knightchannel = convert4(parseInt(rolelist.substr(tempk, 3))).toString();
+                                    knight = parseInt(rolelist.substr(tempk, 3));
+                                    flag = 0;
+                                    break;
+                                }
+                            }
+                            console.log('Knight:' +knight);
+                            console.log('Knightchannel:' +knightchannel);
                         }
                     }
                 }
@@ -232,12 +289,12 @@ bot.on('message', (message) => {
                         var temp1 = wolf1;
                         while (temp1--) {
                             if (rolelist[temp1] == '\n') {
-                                wolves[0] = parseInt(rolelist.substr(temp1 + 1, 2));
+                                wolves[0] = parseInt(rolelist.substr(temp1 + 1, 3));
                                 flag = 0;
                                 break;
                             }
                             else if (temp1 == 0) {
-                                wolves[0] = parseInt(rolelist.substr(temp1, 2));
+                                wolves[0] = parseInt(rolelist.substr(temp1, 3));
                                 flag = 0;
                                 break;
                             }
@@ -251,12 +308,12 @@ bot.on('message', (message) => {
                         var temp2 = wolf2;
                         while (temp2--) {
                             if (rolelist[temp2] == '\n') {
-                                wolves[1] = parseInt(rolelist.substr(temp2 + 1, 2));
+                                wolves[1] = parseInt(rolelist.substr(temp2 + 1, 3));
                                 flag = 0;
                                 break;
                             }
                             else if (temp2 == 0) {
-                                wolves[1] = parseInt(rolelist.substr(temp2, 2));
+                                wolves[1] = parseInt(rolelist.substr(temp2, 3));
                                 flag = 0;
                                 break;
                             }
@@ -270,12 +327,12 @@ bot.on('message', (message) => {
                             var temp3 = wolf3;
                             while (temp3--) {
                                 if (rolelist[temp3] == '\n') {
-                                    wolves[2] = parseInt(rolelist.substr(temp3 + 1, 2));
+                                    wolves[2] = parseInt(rolelist.substr(temp3 + 1, 3));
                                     flag = 0;
                                     break;
                                 }
                                 else if (temp3 == 0) {
-                                    wolves[2] = parseInt(rolelist.substr(temp3, 2));
+                                    wolves[2] = parseInt(rolelist.substr(temp3, 3));
                                     flag = 0;
                                     break;
                                 }
@@ -292,12 +349,12 @@ bot.on('message', (message) => {
                             var temp4 = wolf4;
                             while (temp4--) {
                                 if (rolelist[temp4] == '\n') {
-                                    wolves[3] = parseInt(rolelist.substr(temp4 + 1, 2));
+                                    wolves[3] = parseInt(rolelist.substr(temp4 + 1, 3));
                                     flag = 0;
                                     break;
                                 }
                                 else if (temp4 == 0) {
-                                    wolves[3] = parseInt(rolelist.substr(temp4, 2));
+                                    wolves[3] = parseInt(rolelist.substr(temp4, 3));
                                     flag = 0;
                                     break;
                                 }
@@ -317,6 +374,10 @@ bot.on('message', (message) => {
     else if (message.content == '/day' && status == 1) {
         day = 1;
         daycnt++;
+        votebool = 0;
+        endvotebool = 0;
+        revotebool = 0;
+        endrevotebool = 0;
         let MC = message.guild.roles.find(role => role.name === "MC");
         let dee = message.guild.roles.find(role => role.name === "Dead");
         if (message.member.roles.has(MC.id)) {
@@ -340,12 +401,14 @@ bot.on('message', (message) => {
                 message.guild.roles.get(convert2(dead[0])).members.forEach(async function (member) {
                     member.addRole('644821024692764683').catch(console.error);
                 });
+                isDead[dead[0]] = 1;
             }
             else if (dead[1] != -1 && dead[0] == -1) {
                 bot.channels.get('644812476382445569').send('--------------------------------------------------------\n<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚**'+dead[1]+'號**被殺死');
                 message.guild.roles.get(convert2(dead[1])).members.forEach(async function (member) {
                     member.addRole('644821024692764683').catch(console.error);
                 });
+                isDead[dead[1]] = 1;
             }
             else if (dead[1] != -1 && dead[0] != -1 && dead[1] > dead[0]) {
                 bot.channels.get('644812476382445569').send('--------------------------------------------------------\n<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚**'+dead[0]+'號**、**'+dead[1]+'號**被殺死');
@@ -355,6 +418,8 @@ bot.on('message', (message) => {
                 message.guild.roles.get(convert2(dead[1])).members.forEach(async function (member) {
                     member.addRole('644821024692764683').catch(console.error);
                 });
+                isDead[dead[1]] = 1;
+                isDead[dead[0]] = 1;
             }
             else if (dead[1] != -1 && dead[0] != -1 && dead[1] < dead[0]) {
                 bot.channels.get('644812476382445569').send('--------------------------------------------------------\n<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚**'+dead[1]+'號**、**'+dead[0]+'號**被殺死');
@@ -364,12 +429,15 @@ bot.on('message', (message) => {
                 message.guild.roles.get(convert2(dead[1])).members.forEach(async function (member) {
                     member.addRole('644821024692764683').catch(console.error);
                 });
+                isDead[dead[1]] = 1;
+                isDead[dead[0]] = 1;
             }
             else if (dead[1] == dead[0] && dead[1] != -1) {
                 bot.channels.get('644812476382445569').send('--------------------------------------------------------\n<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚**'+dead[0]+'號**被殺死');
                 message.guild.roles.get(convert2(dead[0])).members.forEach(async function (member) {
                     member.addRole('644821024692764683').catch(console.error);
                 });
+                isDead[dead[0]] = 1;
             }
         }
         if (dead[0] == hunter) {
@@ -377,24 +445,32 @@ bot.on('message', (message) => {
             bot.channels.get(hunterchannel).send('<@&'+convert2(hunter)+'> 啟動獵人技能 選擇你要射殺的對象').then(async function (messages) {
                 msgid3 = messages.id;
                 for (var i = 1; i <= players; i++) {
-                    await messages.react(convert(i));
+                    if (!isDead[i]) await messages.react(convert(i));
                 }
                 await messages.react('❌');
             });
         }
     }
     else if (message.content == '/vote' && status == 1) {
+        if (votebool == 1) {
+            message.reply(' 🚫 Access denied.');
+            return;
+        }
+        votebool = 1;
         let MC = message.guild.roles.find(role => role.name === "MC");
-        let dead = message.guild.roles.find(role => role.name === "Dead");
         if (message.member.roles.has(MC.id)) {
             for (var i = 1; i <= players; i++) {
-                bot.channels.get(convert4(i)).send('🗳️請投票').then(async function (messages) {
-                    for (var j = 1; j <= players; j++) {
-                        if (message.guild.roles.get('644821024692764683').members.include())
-                        await messages.react(convert(j));
-                    }
-                    await messages.react('❌');
-                });
+                if (idiotstatus == 1 && i == idiot) {
+                    bot.channels.get(convert4(i)).send('🚫你不能投票');
+                }
+                else {
+                    bot.channels.get(convert4(i)).send('🗳️請投票').then(async function (messages) {
+                        for (var j = 1; j <= players; j++) {
+                            if (!isDead[j]) await messages.react(convert(j));
+                        }
+                        await messages.react('❌');
+                    });
+                }
             }
             bot.channels.get('644812476382445569').send('🗳️請在各自頻道內投票');
         }
@@ -403,6 +479,11 @@ bot.on('message', (message) => {
         }
     }
     else if (message.content == '/endvote' && status == 1) {
+        if (votebool == 0 || endvotebool == 1) {
+            message.reply(' 🚫 Access denied.');
+            return;
+        }
+        endvotebool = 1;
         var vmax = -1, vi = -1;
         for (var i = 1; i <= players; i++) {
             console.log('vote['+i+'] = ' + vote[i] + ', vmax = '+vmax);
@@ -453,7 +534,9 @@ bot.on('message', (message) => {
                 bot.channels.get('644812476382445569').send(votemsg);
             }
             else {
-                var votemsg = '🗳️投票結束\n<@&'+convert2(vi)+'>淘汰 請發表遺言\n\n__投票結果：__\n';
+                var votemsg;
+                if (vi != idiot) votemsg = '🗳️投票結束\n<@&'+convert2(vi)+'>淘汰 請發表遺言\n\n__投票結果：__\n';
+                else votemsg = '🗳️投票結束\n<@&'+convert2(vi)+'>是白癡\n\n__投票結果：__\n';
                 for (var i = 0; i <= players; i++) {
                     var hasVotes = 0;
                     var templist = [];
@@ -475,15 +558,21 @@ bot.on('message', (message) => {
                     }
                 }
                 bot.channels.get('644812476382445569').send(votemsg);
-                message.guild.roles.get(convert2(vi)).members.forEach(async function (member) {
-                    member.addRole('644821024692764683').catch(console.error);
-                });
+                if (vi != idiot) {
+                    message.guild.roles.get(convert2(vi)).members.forEach(async function (member) {
+                        member.addRole('644821024692764683').catch(console.error);
+                    });
+                    isDead[vi] = 1;
+                }
+                else {
+                    idiotstatus = 1;
+                }
                 if (vi == hunter) {
                     bot.channels.get('644812476382445569').send('<@&'+convert2(hunter)+'> 啟動角色技能 選擇你要帶走的對象');
                     bot.channels.get(hunterchannel).send('<@&'+convert2(hunter)+'> 啟動獵人技能 選擇你要射殺的對象').then(async function (messages) {
                         msgid3 = messages.id;
                         for (var i = 1; i <= players; i++) {
-                            await messages.react(convert(i));
+                            if (!isDead[i]) await messages.react(convert(i));
                         }
                         await messages.react('❌');
                     });
@@ -493,7 +582,7 @@ bot.on('message', (message) => {
                     bot.channels.get(wkchannel).send('<@&'+convert2(wolfking)+'> 啟動狼王技能 選擇你要帶走的對象').then(async function (messages) {
                         msgid4 = messages.id;
                         for (var i = 1; i <= players; i++) {
-                            await messages.react(convert(i));
+                            if (!isDead[i]) await messages.react(convert(i));
                         }
                         await messages.react('❌');
                     });
@@ -503,16 +592,24 @@ bot.on('message', (message) => {
         }
     }
     else if (message.content == '/revote' && status == 1) {
+        if (endvotebool == 0 || revotebool == 1 || votebool == 0) {
+            message.reply(' 🚫 Access denied.');
+            return;
+        }
+        revotebool = 1;
         let MC = message.guild.roles.find(role => role.name === "MC");
         if (message.member.roles.has(MC.id)) {
             for (var i = 1; i <= players; i++) {
                 if (vlist.includes(i)) {
                     bot.channels.get(convert4(i)).send('🚫你不能重新投票');
                 }
+                else if (idiotstatus == 1 && i == idiot) {
+                    bot.channels.get(convert4(i)).send('🚫你不能投票');
+                }
                 else {
                     bot.channels.get(convert4(i)).send('🗳️請重新投票').then(async function (messages) {
                         for (var j = 0; j < vlist.length; j++) {
-                            await messages.react(convert(vlist[j]));
+                            if (!isDead[vlist[j]]) await messages.react(convert(vlist[j]));
                         }
                         await messages.react('❌');
                     });
@@ -525,6 +622,11 @@ bot.on('message', (message) => {
         }
     }
     else if (message.content == '/endrevote' && status == 1) {
+        if (revotebool == 0 || votebool == 0 || endvotebool == 0 || endrevotebool == 1) {
+            message.reply(' 🚫 Access denied.');
+            return;
+        }
+        endrevotebool = 1;
         var vmax = -1, vi = -1;
         for (var i = 1; i <= players; i++) {
             console.log('vote['+i+'] = ' + vote[i] + ', vmax = '+vmax);
@@ -576,7 +678,9 @@ bot.on('message', (message) => {
                 vote = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], votei = [];
             }
             else {
-                var votemsg = '🗳️投票結束\n<@&'+convert2(vi)+'>淘汰 請發表遺言\n\n__投票結果：__\n';
+                var votemsg;
+                if (vi != idiot) votemsg = '🗳️投票結束\n<@&'+convert2(vi)+'>淘汰 請發表遺言\n\n__投票結果：__\n';
+                else votemsg = '🗳️投票結束\n<@&'+convert2(vi)+'>是白癡\n\n__投票結果：__\n';
                 for (var i = 0; i <= players; i++) {
                     var hasVotes = 0;
                     var templist = [];
@@ -598,16 +702,21 @@ bot.on('message', (message) => {
                     }
                 }
                 bot.channels.get('644812476382445569').send(votemsg);
+                if (vi != idiot) {
+                    message.guild.roles.get(convert2(vi)).members.forEach(async function (member) {
+                        member.addRole('644821024692764683').catch(console.error);
+                    });
+                }
+                else {
+                    idiotstatus = 1;
+                }
                 vote = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], votei = [];
-                message.guild.roles.get(convert2(vi)).members.forEach(async function (member) {
-                    member.addRole('644821024692764683').catch(console.error);
-                });
                 if (vi == hunter) {
                     bot.channels.get('644812476382445569').send('<@&'+convert2(hunter)+'> 啟動角色技能 選擇你要帶走的對象');
                     bot.channels.get(hunterchannel).send('<@&'+convert2(hunter)+'> 啟動獵人技能 選擇你要射殺的對象').then(async function (messages) {
                         msgid3 = messages.id;
                         for (var i = 1; i <= players; i++) {
-                            await messages.react(convert(i));
+                            if (!isDead[i]) await messages.react(convert(i));
                         }
                         await messages.react('❌');
                     });
@@ -617,7 +726,7 @@ bot.on('message', (message) => {
                     bot.channels.get(wkchannel).send('<@&'+convert2(wolfking)+'> 啟動狼王技能 選擇你要帶走的對象').then(async function (messages) {
                         msgid4 = messages.id;
                         for (var i = 1; i <= players; i++) {
-                            await messages.react(convert(i));
+                            if (!isDead[i]) await messages.react(convert(i));
                         }
                         await messages.react('❌');
                     });
@@ -669,10 +778,10 @@ bot.on('message', (message) => {
                     });
                 }
                 else if (kill == witch && daycnt > 0 && poison == 1) {
-                    bot.channels.get(witchchannel).send('昨晚**你**被殺死了，你**不能自救**。選擇你要投毒的對象\n\n(Reactions not showing up? Type /poison <no.>)').then(async function (message7) {
+                    bot.channels.get(witchchannel).send('昨晚**你**被殺死了，你**不能自救**。選擇你要投毒的對象').then(async function (message7) {
                         msgid2 = message7.id;
                         for (var i = 1; i <= players; i++) {
-                            await message7.react(convert(i));
+                            if (!isDead[i]) await message7.react(convert(i));
                         }
                         await message7.react('❌');
                     }); 
@@ -684,10 +793,10 @@ bot.on('message', (message) => {
             else {
                 dead[0] = kill;
                 if (poison == 1) {
-                    bot.channels.get(witchchannel).send('選擇你要投毒的對象\n\n(Reactions not showing up? Type /poison <no.>)').then(async function (message7) {
+                    bot.channels.get(witchchannel).send('選擇你要投毒的對象').then(async function (message7) {
                         msgid2 = message7.id;
                         for (var i = 1; i <= players; i++) {
-                            await message7.react(convert(i));
+                            if (!isDead[i]) await message7.react(convert(i));
                         }
                         await message7.react('❌');
                     }); 
@@ -723,6 +832,22 @@ bot.on('message', (message) => {
             }
         }
     }
+    else if (message.content == '/knight' && status == 1) {
+        if (message.member.id == '653535759508439051' || message.member.id == '677378738228559873') return;
+        if (knightstatus == 1 || day == 0 || !message.member.roles.has(convert2(knight))) {
+            message.reply(' 🚫 Access denied.');
+        }
+        else {
+            bot.channels.get('644812476382445569').send('<@&'+convert2(knight)+'> ⚔️ 啟動騎士技能 選擇你要查驗的對象');
+            bot.channels.get(knightchannel).send('<@&'+convert2(knight)+'> ⚔️ 啟動騎士技能 選擇你要查驗的對象').then(async function (messagesss) {
+                msgid5 = messagesss.id;
+                for (var i = 1; i <= players; i++) {
+                    if (i == knight) continue;
+                    if (!isDead[i]) await messagesss.react(convert(i));
+                }
+            });
+        }
+    }
     else if (message.content.includes('!endgame') && status == 1) {
         save = 1;
         poison = 1;
@@ -731,6 +856,9 @@ bot.on('message', (message) => {
         daycnt = 0;
         wolves = [];
         vlist = [];
+        idiotstatus = 0;
+        knightstaus = 0;
+        isDead = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
     }
     else if (message.content == '/togglepoison' && status == 1) {
         if (message.member.id == '653535759508439051' || message.member.id == '677378738228559873') return;
@@ -768,29 +896,6 @@ bot.on('message', (message) => {
             }
         }
     }
-    else if (message.content.includes('/poison') && status == 1) {
-        if (message.member.id == '653968885720285204') return;
-        if (message.channel.id != witchchannel || poison == 0 || day == 1) {
-            message.reply(' 🚫 Access denied.');
-        }
-        else {
-            if (message.content.substr(8, message.content.length) < 1) {
-                message.reply(' 🚫 Invalid input.');
-                return;
-            }
-            var targett = parseInt(message.content.substr(8, message.content.length));
-            if (targett < 1 || targett > players) {
-                message.reply(' 🚫 Invalid input.');
-                return;
-            }
-            else {
-                dead[1] = targett;
-                message.channel.fetchMessage(msgid2).then(msg => msg.delete());
-                poison = 0;
-                bot.channels.get(witchchannel).send('✅**'+targett+'號**已被毒死');
-            }
-        }
-    }
 });
 bot.on('raw', async event => {
     if (!events.hasOwnProperty(event.t)) return;
@@ -813,19 +918,20 @@ bot.on('raw', async event => {
         if (event.t === "MESSAGE_REACTION_ADD") {
             console.log('Message = ' + messager.content);
             if (messager.content.includes('被殺死')) {
-                if (emojiKey == '✅' && userr.id != '653968885720285204') {
+                if (emojiKey == '✅' && userr.id != '653968885720285204' && userr.id != '677378738228559873') {
                     channelr.fetchMessage(msgid).then(msg => msg.delete());
                     save = 0;
                     bot.channels.get(witchchannel).send('✅已使用救藥('+kill+'號)');
                 }
-                else if (emojiKey == '❎' && userr.id != '653968885720285204' && poison == 1) {
+                else if (emojiKey == '❎' && userr.id != '653968885720285204' && userr.id != '677378738228559873' && poison == 1) {
                     channelr.fetchMessage(msgid).then(msg => msg.delete());
                     dead[0] = kill;
                     if (poison == 1) {
-                        bot.channels.get(witchchannel).send('選擇你要投毒的對象\n\n(Reactions not showing up? Type /poison <no.> or click ❌ to abort)').then(async function (message) {
+                        bot.channels.get(witchchannel).send('選擇你要投毒的對象').then(async function (message) {
                             msgid2 = message.id;
                             for (var i = 1; i <= players; i++) {
-                                await message.react(convert(i));
+                                if (i == witch) continue;
+                                if (!isDead[i]) await message.react(convert(i));
                             }
                             await message.react('❌');
                         }); 
@@ -836,7 +942,7 @@ bot.on('raw', async event => {
     }
     else if (messager.id == msgid2) {
         if (event.t === "MESSAGE_REACTION_ADD") {
-            if (messager.content.includes('投毒的對象') && userr.id != '653968885720285204') {
+            if (messager.content.includes('投毒的對象') && userr.id != '653968885720285204' && userr.id != '677378738228559873') {
                 var targetr = convert3(emojir.toString());
                 console.log(emojir);
                 console.log(targetr);
@@ -854,21 +960,22 @@ bot.on('raw', async event => {
     }
     else if (messager.id == msgid3) {
         if (event.t === "MESSAGE_REACTION_ADD") {
-            if (messager.content.includes('射殺的') && userr.id != '653968885720285204') {
+            if (messager.content.includes('射殺的') && userr.id != '653968885720285204' && userr.id != '677378738228559873') {
                 var targeth = convert3(emojir.toString());
                 if (targeth != -1) {
                     channelr.fetchMessage(msgid3).then(msg => msg.delete());
                     bot.channels.get(hunterchannel).send('✅**'+targeth+'號**已被帶走'); 
                     bot.channels.get('644812476382445569').send('<@&'+convert2(targeth)+'>'+'淘汰');
-                    message.guild.roles.get(convert2(targeth)).members.forEach(async function (member) {
+                    messager.guild.roles.get(convert2(targeth)).members.forEach(async function (member) {
                         member.addRole('644821024692764683').catch(console.error);
                     });
+                    isDead[targeth] = 1;
                     if (targeth == wolfking) {
                         bot.channels.get('644812476382445569').send('<@&'+convert2(wolfking)+'> 啟動角色技能 選擇你要帶走的對象');
                         bot.channels.get(wkchannel).send('<@&'+convert2(wolfking)+'> 啟動狼王技能 選擇你要帶走的對象').then(async function (messagess) {
                             msgid4 = messagess.id;
                             for (var i = 1; i <= players; i++) {
-                                await messagess.react(convert(i));
+                                if (!isDead[i]) await messagess.react(convert(i));
                             }
                             await messagess.react('❌');
                         });
@@ -882,21 +989,22 @@ bot.on('raw', async event => {
     }
     else if (messager.id == msgid4) {
         if (event.t === "MESSAGE_REACTION_ADD") {
-            if (messager.content.includes('帶走的') && userr.id != '653968885720285204') {
+            if (messager.content.includes('帶走的') && userr.id != '653968885720285204' && userr.id != '677378738228559873') {
                 var targetwk = convert3(emojir.toString());
                 if (targetwk != -1) {
                     channelr.fetchMessage(msgid4).then(msg => msg.delete());
                     bot.channels.get(wkchannel).send('✅**'+targetwk+'號**已被帶走'); 
                     bot.channels.get('644812476382445569').send('<@&'+convert2(targetwk)+'>'+'淘汰');
-                    message.guild.roles.get(convert2(targetwk)).members.forEach(async function (member) {
+                    messager.guild.roles.get(convert2(targetwk)).members.forEach(async function (member) {
                         member.addRole('644821024692764683').catch(console.error);
                     });
+                    isDead[targetwk] = 1;
                     if (targetwk == hunter) {
                         bot.channels.get('644812476382445569').send('<@&'+convert2(hunter)+'> 啟動角色技能 選擇你要帶走的對象');
                         bot.channels.get(hunterchannel).send('<@&'+convert2(hunter)+'> 啟動獵人技能 選擇你要射殺的對象').then(async function (messagess) {
                             msgid3 = messagess.id;
                             for (var i = 1; i <= players; i++) {
-                                await messagess.react(convert(i));
+                                if (!isDead[i]) await messagess.react(convert(i));
                             }
                             await messagess.react('❌');
                         });
@@ -908,8 +1016,49 @@ bot.on('raw', async event => {
             }
         }
     }
+    else if (messager.id == msgid5) {
+        if (event.t === "MESSAGE_REACTION_ADD") {
+            if (messager.content.includes('騎士') && userr.id != '653968885720285204' && userr.id != '677378738228559873') {
+                var targetk = convert3(emojir.toString());
+                var isWolf2 = 0;
+                for (var i = 0; i <= 3; i++) {
+                    if (wolves[i] == targetk) {
+                        isWolf2 = 1;
+                    }
+                }
+                if (isWolf2) {
+                    channelr.fetchMessage(msgid5).then(msg => msg.delete());
+                    bot.channels.get(knightchannel).send('🔎 <@&'+convert2(targetk)+'> **是狼人**');
+                    bot.channels.get('644812476382445569').send('🔎 <@&'+convert2(targetk)+'> **是狼人**');
+                    messager.guild.roles.get(convert2(targetk)).members.forEach(async function (member) {
+                        member.addRole('644821024692764683').catch(console.error);
+                    });
+                    isDead[targetk] = 1;
+                    if (targetk == wolfking) {
+                        bot.channels.get('644812476382445569').send('<@&'+convert2(wolfking)+'> 啟動角色技能 選擇你要帶走的對象');
+                        bot.channels.get(wkchannel).send('<@&'+convert2(wolfking)+'> 啟動狼王技能 選擇你要帶走的對象').then(async function (messagess) {
+                            msgid4 = messagess.id;
+                            for (var i = 1; i <= players; i++) {
+                                if (!isDead[i]) await messagess.react(convert(i));
+                            }
+                            await messagess.react('❌');
+                        });
+                    }
+                }
+                else {
+                    bot.channels.get(knightchannel).send('🔎 <@&'+convert2(targetk)+'> **不是狼人**\n騎士以死謝罪');
+                    bot.channels.get('644812476382445569').send('🔎 <@&'+convert2(targetk)+'> **不是狼人**\n騎士以死謝罪');
+                    message.guild.roles.get(convert2(knight)).members.forEach(async function (member) {
+                        member.addRole('644821024692764683').catch(console.error);
+                    });
+                    isDead[knight] = 1;
+                }
+                knightstatus = 1;
+            }
+        }
+    }
     else if (event.t === "MESSAGE_REACTION_ADD") {
-        if (messager.content == '🗳️請投票' && userr.id != '653968885720285204') {
+        if (messager.content == '🗳️請投票' && userr.id != '653968885720285204' && userr.id != '677378738228559873') {
             var targetv = convert3(emojir.toString());
             if (targetv != -1) {
                 messager.delete();
@@ -928,7 +1077,7 @@ bot.on('raw', async event => {
                 votei[convert5(data.channel_id)] = 0;
             }
         }
-        if (messager.content == '🗳️請重新投票' && userr.id != '653968885720285204') {
+        if (messager.content == '🗳️請重新投票' && userr.id != '653968885720285204' && userr.id != '677378738228559873') {
             var targetv = convert3(emojir.toString());
             if (targetv != -1) {
                 messager.delete();
@@ -941,7 +1090,7 @@ bot.on('raw', async event => {
             else {
                 messager.delete();
                 bot.channels.get(data.channel_id).send('✅已選擇**棄票**'); 
-                console.log('Total number of votes for '+targetv+' is '+vote[targetv]);
+                console.log('Total number of votes for '+targetv+' is '+vote[0]);
                 console.log('Added vote for '+targetv+' from ' + convert5(data.channel_id));
                 vote[0]++;
                 votei[convert5(data.channel_id)] = 0;
