@@ -11,6 +11,10 @@ var msgid, msgid2, msgid3, msgid4, msgid5;
 var witch;
 var hunter;
 var idiot, idiotstatus = 0, knight, knightstatus = 0;
+var vcnt = 0, gcnt = 0, wcnt = 0;
+var isG = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+var isV = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
+var isW = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 var vlist = [];
 var wolfking;
 var isDead = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
@@ -108,6 +112,14 @@ bot.on('message', (message) => {
     else if (message.content == '/commands') {
         message.reply('List of commands for this bot:\n\nFor everyone\'s use:\n`/status` - Check the status of the bot (enabled/disabled)\n`/ping` - pings @Active WW member 5 times (please do not abuse or you will lose access to this command)\n\nFor MC\'s use:\n`/night` - Mute everyone except MC (as night falls)\n`/day` - Unmute everyone except those who are dead (assigned @Dead role)\n`/vote` - creates a vote menu in #voting\n`/removeroles` - Remove roles 1-12號 and dead from all members');
     }
+    else if (message.content.includes('!role')) {
+        let channel2 = bot.channels.get("654262918069878784");
+        channel2.fetchMessages({limit : 1}).then(messages => {
+            players = parseInt(messages.first());
+            vcnt = players;
+        })
+        .catch(console.error);
+    }
     else if (message.content == '/night' && status == 1) {
         day = 0;
         checkstatus = 1;
@@ -125,11 +137,6 @@ bot.on('message', (message) => {
                     member[1].setMute(true);
                 }
             }
-            let channel2 = bot.channels.get("654262918069878784");
-            channel2.fetchMessages({limit : 1}).then(messages => {
-                players = parseInt(messages.first());
-            })
-            .catch(console.error);
             let botroles2 = bot.channels.get("677883179649990656");
             botroles2.fetchMessages({limit : 1}).then(messages2 => {
                 var rolelist = messages2.first().toString();
@@ -141,51 +148,66 @@ bot.on('message', (message) => {
                 var kindex = rolelist.indexOf('knight');
                 console.log('Wkindex:'+wkindex);
                 var flag = 1;
-                while (windex--) {
-                    if (flag == 0) break;
-                    if (rolelist[windex] == '.') {
-                        var tempr = windex;
-                        while (tempr--) {
-                            if (rolelist[tempr] == '\n') {
-                                witchchannel = convert4(parseInt(rolelist.substr(tempr + 1, 3))).toString();
-                                witch = parseInt(rolelist.substr(tempr + 1, 3));
-                                console.log('Witchchannel:'+witchchannel);
-                                flag = 0;
-                                break;
-                            }
-                            else if (tempr == 0) {
-                                witchchannel = convert4(parseInt(rolelist.substr(tempr, 3))).toString();
-                                witch = parseInt(rolelist.substr(tempr, 3));
-                                console.log('Witchchannel:'+witchchannel);
-                                flag = 0;
-                                break;
+                if (windex != -1) {
+                    if (daycnt == 0) gcnt++;
+                    while (windex--) {
+                        if (flag == 0) break;
+                        if (rolelist[windex] == '.') {
+                            var tempr = windex;
+                            while (tempr--) {
+                                if (rolelist[tempr] == '\n') {
+                                    witchchannel = convert4(parseInt(rolelist.substr(tempr + 1, 3))).toString();
+                                    witch = parseInt(rolelist.substr(tempr + 1, 3));
+                                    console.log('Witchchannel:'+witchchannel);
+                                    isG[witch] = 1;
+                                    isV[witch] = 0;
+                                    flag = 0;
+                                    break;
+                                }
+                                else if (tempr == 0) {
+                                    witchchannel = convert4(parseInt(rolelist.substr(tempr, 3))).toString();
+                                    witch = parseInt(rolelist.substr(tempr, 3));
+                                    console.log('Witchchannel:'+witchchannel);
+                                    isG[witch] = 1;
+                                    isV[witch] = 0;
+                                    flag = 0;
+                                    break;
+                                }
                             }
                         }
                     }
                 }
                 flag = 1;
-                while (sindex--) {
-                    if (flag == 0) break;
-                    if (rolelist[sindex] == '.') {
-                        var temps = sindex;
-                        while (temps--) {
-                            if (rolelist[temps] == '\n') {
-                                seerchannel = convert4(parseInt(rolelist.substr(temps + 1, 3))).toString();
-                                console.log('Seerchannel:'+seerchannel);
-                                flag = 0;
-                                break;
-                            }
-                            else if (temps == 0) {
-                                seerchannel = convert4(parseInt(rolelist.substr(temps, 3))).toString();
-                                console.log('Seerchannel:'+seerchannel);
-                                flag = 0;
-                                break;
+                if (sindex != -1) {
+                    if (daycnt == 0) gcnt++;
+                    while (sindex--) {
+                        if (flag == 0) break;
+                        if (rolelist[sindex] == '.') {
+                            var temps = sindex;
+                            while (temps--) {
+                                if (rolelist[temps] == '\n') {
+                                    seerchannel = convert4(parseInt(rolelist.substr(temps + 1, 3))).toString();
+                                    console.log('Seerchannel:'+seerchannel);
+                                    flag = 0;
+                                    isG[parseInt(rolelist.substr(temps + 1, 3))] = 1;
+                                    isV[parseInt(rolelist.substr(temps + 1, 3))] = 0;
+                                    break;
+                                }
+                                else if (temps == 0) {
+                                    seerchannel = convert4(parseInt(rolelist.substr(temps, 3))).toString();
+                                    console.log('Seerchannel:'+seerchannel);
+                                    isG[parseInt(rolelist.substr(temps + 1, 3))] = 1;
+                                    isV[parseInt(rolelist.substr(temps + 1, 3))] = 0;
+                                    flag = 0;
+                                    break;
+                                }
                             }
                         }
                     }
                 }
                 flag = 1;
                 if (hindex != -1) {
+                    if (daycnt == 0) gcnt++;
                     while (hindex--) {
                         if (flag == 0) break;
                         if (rolelist[hindex] == '.') {
@@ -194,12 +216,16 @@ bot.on('message', (message) => {
                                 if (rolelist[temph] == '\n') {
                                     hunterchannel = convert4(parseInt(rolelist.substr(temph + 1, 3))).toString();
                                     hunter = parseInt(rolelist.substr(temph + 1, 3));
+                                    isG[hunter] = 1;
+                                    isV[hunter] = 0;
                                     flag = 0;
                                     break;
                                 }
                                 else if (temph == 0) {
                                     hunterchannel = convert4(parseInt(rolelist.substr(temph, 3))).toString();
                                     hunter = parseInt(rolelist.substr(temph, 3));
+                                    isG[hunter] = 1;
+                                    isV[hunter] = 0;
                                     flag = 0;
                                     break;
                                 }
@@ -217,12 +243,16 @@ bot.on('message', (message) => {
                                 if (rolelist[tempwk] == '\n') {
                                     wkchannel = convert4(parseInt(rolelist.substr(tempwk + 1, 3))).toString();
                                     wolfking = parseInt(rolelist.substr(tempwk + 1, 3));
+                                    isW[wolfking] = 1;
+                                    isV[wolfking] = 0;
                                     flag = 0;
                                     break;
                                 }
                                 else if (tempwk == 0) {
                                     wkchannel = convert4(parseInt(rolelist.substr(tempwk, 3))).toString();
                                     wolfking = parseInt(rolelist.substr(tempwk, 3));
+                                    isW[wolfking] = 1;
+                                    isV[wolfking] = 0;
                                     flag = 0;
                                     break;
                                 }
@@ -233,6 +263,7 @@ bot.on('message', (message) => {
                 }
                 flag = 1;
                 if (iindex != -1) {
+                    if (daycnt == 0) gcnt++;
                     while (iindex--) {
                         if (flag == 0) break;
                         if (rolelist[iindex] == '.') {
@@ -241,11 +272,15 @@ bot.on('message', (message) => {
                                 if (rolelist[tempi] == '\n') {
                                     idiot = parseInt(rolelist.substr(tempi + 1, 3));
                                     flag = 0;
+                                    isG[idiot] = 1;
+                                    isV[idiot] = 0;
                                     break;
                                 }
                                 else if (tempi == 0) {
                                     idiot = parseInt(rolelist.substr(tempi, 3));
                                     flag = 0;
+                                    isG[idiot] = 1;
+                                    isV[idiot] = 0;
                                     break;
                                 }
                             }
@@ -255,6 +290,7 @@ bot.on('message', (message) => {
                 }
                 flag = 1;
                 if (kindex != -1) {
+                    if (daycnt == 0) gcnt++;
                     while (kindex--) {
                         if (flag == 0) break;
                         if (rolelist[kindex] == '.') {
@@ -264,12 +300,16 @@ bot.on('message', (message) => {
                                     knightchannel = convert4(parseInt(rolelist.substr(tempk, 3))).toString();
                                     knight = parseInt(rolelist.substr(tempk + 1, 3));
                                     flag = 0;
+                                    isG[knight] = 1;
+                                    isV[knight] = 0;
                                     break;
                                 }
                                 else if (tempk == 0) {
                                     knightchannel = convert4(parseInt(rolelist.substr(tempk, 3))).toString();
                                     knight = parseInt(rolelist.substr(tempk, 3));
                                     flag = 0;
+                                    isG[knight] = 1;
+                                    isV[knight] = 0;
                                     break;
                                 }
                             }
@@ -283,6 +323,7 @@ bot.on('message', (message) => {
                 var wolf3 = wolf2 == -1 ? -1 : rolelist.indexOf('wolf', (wolf2 + 1));
                 var wolf4 = wolf3 == -1 ? -1 : rolelist.indexOf('wolf', (wolf3 + 1));
                 flag = 1;
+                if (daycnt == 0) wcnt = 2;
                 while (wolf1--) {
                     if (flag == 0) break;
                     if (rolelist[wolf1] == '.') {
@@ -291,10 +332,14 @@ bot.on('message', (message) => {
                             if (rolelist[temp1] == '\n') {
                                 wolves[0] = parseInt(rolelist.substr(temp1 + 1, 3));
                                 flag = 0;
+                                isW[wolves[0]] = 1;
+                                isV[wolves[0]] = 0;
                                 break;
                             }
                             else if (temp1 == 0) {
                                 wolves[0] = parseInt(rolelist.substr(temp1, 3));
+                                isW[wolves[0]] = 1;
+                                isV[wolves[0]] = 0;
                                 flag = 0;
                                 break;
                             }
@@ -309,11 +354,15 @@ bot.on('message', (message) => {
                         while (temp2--) {
                             if (rolelist[temp2] == '\n') {
                                 wolves[1] = parseInt(rolelist.substr(temp2 + 1, 3));
+                                isW[wolves[1]] = 1;
+                                isV[wolves[1]] = 0;
                                 flag = 0;
                                 break;
                             }
                             else if (temp2 == 0) {
                                 wolves[1] = parseInt(rolelist.substr(temp2, 3));
+                                isW[wolves[1]] = 1;
+                                isV[wolves[1]] = 0;
                                 flag = 0;
                                 break;
                             }
@@ -321,6 +370,7 @@ bot.on('message', (message) => {
                     }
                 }flag = 1;
                 if (wolf3 != -1) {
+                    if (daycnt == 0) wcnt++;
                     while (wolf3--) {
                         if (flag == 0) break;
                         if (rolelist[wolf3] == '.') {
@@ -328,11 +378,15 @@ bot.on('message', (message) => {
                             while (temp3--) {
                                 if (rolelist[temp3] == '\n') {
                                     wolves[2] = parseInt(rolelist.substr(temp3 + 1, 3));
+                                    isW[wolves[2]] = 1;
+                                    isV[wolves[2]] = 0;
                                     flag = 0;
                                     break;
                                 }
                                 else if (temp3 == 0) {
                                     wolves[2] = parseInt(rolelist.substr(temp3, 3));
+                                    isW[wolves[2]] = 1;
+                                    isV[wolves[2]] = 0;
                                     flag = 0;
                                     break;
                                 }
@@ -343,6 +397,7 @@ bot.on('message', (message) => {
                 else wolves[2] = -1;
                 flag = 1;
                 if (wolf4 != -1) {
+                    if (daycnt == 0) wcnt++;
                     while (wolf4--) {
                         if (flag == 0) break;
                         if (rolelist[wolf4] == '.') {
@@ -350,11 +405,15 @@ bot.on('message', (message) => {
                             while (temp4--) {
                                 if (rolelist[temp4] == '\n') {
                                     wolves[3] = parseInt(rolelist.substr(temp4 + 1, 3));
+                                    isW[wolves[3]] = 1;
+                                    isV[wolves[3]] = 0;
                                     flag = 0;
                                     break;
                                 }
                                 else if (temp4 == 0) {
                                     wolves[3] = parseInt(rolelist.substr(temp4, 3));
+                                    isW[wolves[3]] = 1;
+                                    isV[wolves[3]] = 0;
                                     flag = 0;
                                     break;
                                 }
@@ -363,6 +422,13 @@ bot.on('message', (message) => {
                     }
                 }
                 else wolves[3] = -1;
+                if (daycnt == 0) {
+                    vcnt -= gcnt + wcnt;
+                    console.log('players: ' + players);
+                    console.log('vcnt: ' + vcnt);
+                    console.log('wcnt: ' + wcnt);
+                    console.log('gcnt: ' + gcnt);
+                }
             })
             .catch(console.error);
             message.reply(' ✅ Muted.');
@@ -440,7 +506,15 @@ bot.on('message', (message) => {
                 isDead[dead[0]] = 1;
             }
         }
-        if (dead[0] == hunter) {
+        if (wcnt == 0) {
+            bot.channels.get('644812476382445569').send('**🎉 遊戲結束 好人獲勝 🎉**');
+            return;
+        }
+        else if (gcnt == 0 || vcnt == 0) {
+            bot.channels.get('644812476382445569').send('**🎉 遊戲結束 狼人獲勝 🎉**');
+            return;
+        }
+        else if (dead[0] == hunter) {
             bot.channels.get('644812476382445569').send('<@&'+convert2(hunter)+'> 啟動角色技能 選擇你要帶走的對象');
             bot.channels.get(hunterchannel).send('<@&'+convert2(hunter)+'> 啟動獵人技能 選擇你要射殺的對象').then(async function (messages) {
                 msgid3 = messages.id;
@@ -464,12 +538,14 @@ bot.on('message', (message) => {
                     bot.channels.get(convert4(i)).send('🚫你不能投票');
                 }
                 else {
-                    bot.channels.get(convert4(i)).send('🗳️請投票').then(async function (messages) {
-                        for (var j = 1; j <= players; j++) {
-                            if (!isDead[j]) await messages.react(convert(j));
-                        }
-                        await messages.react('❌');
-                    });
+                    if (!isDead[i]) {
+                        bot.channels.get(convert4(i)).send('🗳️請投票').then(async function (messages) {
+                            for (var j = 1; j <= players; j++) {
+                                if (!isDead[j]) await messages.react(convert(j));
+                            }
+                            await messages.react('❌');
+                        });
+                    }
                 }
             }
             bot.channels.get('644812476382445569').send('🗳️請在各自頻道內投票');
@@ -484,7 +560,7 @@ bot.on('message', (message) => {
             return;
         }
         endvotebool = 1;
-        var vmax = -1, vi = -1;
+        var vmax = -999, vi = -999;
         for (var i = 1; i <= players; i++) {
             console.log('vote['+i+'] = ' + vote[i] + ', vmax = '+vmax);
             if (vote[i] > vmax) {
@@ -535,7 +611,11 @@ bot.on('message', (message) => {
             }
             else {
                 var votemsg;
-                if (vi != idiot) votemsg = '🗳️投票結束\n<@&'+convert2(vi)+'>淘汰 請發表遺言\n\n__投票結果：__\n';
+                if (isW[vi]) wcnt--;
+                else if (isV[vi]) vcnt--;
+                else if (isG[vi]) gcnt--;
+                if (vcnt == 0 || gcnt == 0 || wcnt == 0) votemsg = '🗳️投票結束\n<@&'+convert2(vi)+'>淘汰\n\n__投票結果：__\n';
+                else if (vi != idiot) votemsg = '🗳️投票結束\n<@&'+convert2(vi)+'>淘汰 請發表遺言\n\n__投票結果：__\n';
                 else votemsg = '🗳️投票結束\n<@&'+convert2(vi)+'>是白癡\n\n__投票結果：__\n';
                 for (var i = 0; i <= players; i++) {
                     var hasVotes = 0;
@@ -558,6 +638,14 @@ bot.on('message', (message) => {
                     }
                 }
                 bot.channels.get('644812476382445569').send(votemsg);
+                if (wcnt == 0) {
+                    bot.channels.get('644812476382445569').send('**🎉 遊戲結束 好人獲勝 🎉**');
+                    return;
+                }
+                if (vcnt == 0 || gcnt == 0) {
+                    bot.channels.get('644812476382445569').send('**🎉 遊戲結束 狼人獲勝 🎉**');
+                    return;
+                }
                 if (vi != idiot) {
                     message.guild.roles.get(convert2(vi)).members.forEach(async function (member) {
                         member.addRole('644821024692764683').catch(console.error);
@@ -588,8 +676,8 @@ bot.on('message', (message) => {
                     });
                 }
             }
-            vote = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], votei = [];
         }
+        vote = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], votei = [];
     }
     else if (message.content == '/revote' && status == 1) {
         if (endvotebool == 0 || revotebool == 1 || votebool == 0) {
@@ -607,12 +695,14 @@ bot.on('message', (message) => {
                     bot.channels.get(convert4(i)).send('🚫你不能投票');
                 }
                 else {
-                    bot.channels.get(convert4(i)).send('🗳️請重新投票').then(async function (messages) {
-                        for (var j = 0; j < vlist.length; j++) {
-                            if (!isDead[vlist[j]]) await messages.react(convert(vlist[j]));
-                        }
-                        await messages.react('❌');
-                    });
+                    if (!isDead[i]) {
+                        bot.channels.get(convert4(i)).send('🗳️請重新投票').then(async function (messages) {
+                            for (var j = 0; j < vlist.length; j++) {
+                                if (!isDead[vlist[j]]) await messages.react(convert(vlist[j]));
+                            }
+                            await messages.react('❌');
+                        });
+                    }
                 }
             }
             bot.channels.get('644812476382445569').send('🗳️請在各自頻道內重新投票');
@@ -679,7 +769,11 @@ bot.on('message', (message) => {
             }
             else {
                 var votemsg;
-                if (vi != idiot) votemsg = '🗳️投票結束\n<@&'+convert2(vi)+'>淘汰 請發表遺言\n\n__投票結果：__\n';
+                if (isW[vi]) wcnt--;
+                else if (isV[vi]) vcnt--;
+                else if (isG[vi]) gcnt--;
+                if (vcnt == 0 || gcnt == 0 || wcnt == 0) votemsg = '🗳️投票結束\n<@&'+convert2(vi)+'>淘汰\n\n__投票結果：__\n';
+                else if (vi != idiot) votemsg = '🗳️投票結束\n<@&'+convert2(vi)+'>淘汰 請發表遺言\n\n__投票結果：__\n';
                 else votemsg = '🗳️投票結束\n<@&'+convert2(vi)+'>是白癡\n\n__投票結果：__\n';
                 for (var i = 0; i <= players; i++) {
                     var hasVotes = 0;
@@ -702,6 +796,14 @@ bot.on('message', (message) => {
                     }
                 }
                 bot.channels.get('644812476382445569').send(votemsg);
+                if (wcnt == 0) {
+                    bot.channels.get('644812476382445569').send('**🎉 遊戲結束 好人獲勝 🎉**');
+                    return;
+                }
+                if (vcnt == 0 || gcnt == 0) {
+                    bot.channels.get('644812476382445569').send('**🎉 遊戲結束 狼人獲勝 🎉**');
+                    return;
+                }
                 if (vi != idiot) {
                     message.guild.roles.get(convert2(vi)).members.forEach(async function (member) {
                         member.addRole('644821024692764683').catch(console.error);
@@ -733,6 +835,7 @@ bot.on('message', (message) => {
                 }
             }
         }
+        vote = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], votei = [];
     }
     else if (message.content == '/removeroles' && status == 1) {
         let admin = message.guild.roles.find(role => role.name === 'Admin');
@@ -768,6 +871,9 @@ bot.on('message', (message) => {
                 return;
             }
             message.reply(' ✅ 已處決' + kill + '號');
+            if (isW[kill]) wcnt--;
+            else if (isV[kill]) vcnt--;
+            else if (isG[kill]) gcnt--;
             cankill = 0;
             if (save == 1) {
                 if (kill != witch || (kill == witch && day == 0)) {
@@ -859,6 +965,9 @@ bot.on('message', (message) => {
         idiotstatus = 0;
         knightstaus = 0;
         isDead = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+        isG = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+        isV = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
+        isW = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
     }
     else if (message.content == '/togglepoison' && status == 1) {
         if (message.member.id == '653535759508439051' || message.member.id == '677378738228559873') return;
@@ -922,6 +1031,9 @@ bot.on('raw', async event => {
                     channelr.fetchMessage(msgid).then(msg => msg.delete());
                     save = 0;
                     bot.channels.get(witchchannel).send('✅已使用救藥('+kill+'號)');
+                    if (isW[kill]) wcnt++;
+                    else if (isV[kill]) vcnt++;
+                    else if (isG[kill]) gcnt++;
                 }
                 else if (emojiKey == '❎' && userr.id != '653968885720285204' && userr.id != '677378738228559873' && poison == 1) {
                     channelr.fetchMessage(msgid).then(msg => msg.delete());
@@ -950,6 +1062,9 @@ bot.on('raw', async event => {
                     channelr.fetchMessage(msgid2).then(msg => msg.delete());
                     poison = 0;
                     bot.channels.get(witchchannel).send('✅**'+targetr+'號**已被毒死');
+                    if (isW[kill]) wcnt--;
+                    else if (isV[kill]) vcnt--;
+                    else if (isG[kill]) gcnt--;
                     dead[1] = targetr;
                 }
                 else {
@@ -970,6 +1085,17 @@ bot.on('raw', async event => {
                         member.addRole('644821024692764683').catch(console.error);
                     });
                     isDead[targeth] = 1;
+                    if (isW[targeth]) wcnt--;
+                    else if (isV[targeth]) vcnt--;
+                    else if (isG[targeth]) gcnt--;
+                    if (wcnt == 0) {
+                        bot.channels.get('644812476382445569').send('**🎉 遊戲結束 好人獲勝 🎉**');
+                        return;
+                    }
+                    if (vcnt == 0 || gcnt == 0) {
+                        bot.channels.get('644812476382445569').send('**🎉 遊戲結束 狼人獲勝 🎉**');
+                        return;
+                    }
                     if (targeth == wolfking) {
                         bot.channels.get('644812476382445569').send('<@&'+convert2(wolfking)+'> 啟動角色技能 選擇你要帶走的對象');
                         bot.channels.get(wkchannel).send('<@&'+convert2(wolfking)+'> 啟動狼王技能 選擇你要帶走的對象').then(async function (messagess) {
@@ -999,6 +1125,17 @@ bot.on('raw', async event => {
                         member.addRole('644821024692764683').catch(console.error);
                     });
                     isDead[targetwk] = 1;
+                    if (isW[targetwk]) wcnt--;
+                    else if (isV[targetwk]) vcnt--;
+                    else if (isG[targetwk]) gcnt--;
+                    if (wcnt == 0) {
+                        bot.channels.get('644812476382445569').send('**🎉 遊戲結束 好人獲勝 🎉**');
+                        return;
+                    }
+                    if (vcnt == 0 || gcnt == 0) {
+                        bot.channels.get('644812476382445569').send('**🎉 遊戲結束 狼人獲勝 🎉**');
+                        return;
+                    }
                     if (targetwk == hunter) {
                         bot.channels.get('644812476382445569').send('<@&'+convert2(hunter)+'> 啟動角色技能 選擇你要帶走的對象');
                         bot.channels.get(hunterchannel).send('<@&'+convert2(hunter)+'> 啟動獵人技能 選擇你要射殺的對象').then(async function (messagess) {
@@ -1034,6 +1171,11 @@ bot.on('raw', async event => {
                         member.addRole('644821024692764683').catch(console.error);
                     });
                     isDead[targetk] = 1;
+                    wcnt--;
+                    if (wcnt == 0) {
+                        bot.channels.get('644812476382445569').send('**🎉 遊戲結束 好人獲勝 🎉**');
+                        return;
+                    }
                     if (targetk == wolfking) {
                         bot.channels.get('644812476382445569').send('<@&'+convert2(wolfking)+'> 啟動角色技能 選擇你要帶走的對象');
                         bot.channels.get(wkchannel).send('<@&'+convert2(wolfking)+'> 啟動狼王技能 選擇你要帶走的對象').then(async function (messagess) {
@@ -1052,6 +1194,11 @@ bot.on('raw', async event => {
                         member.addRole('644821024692764683').catch(console.error);
                     });
                     isDead[knight] = 1;
+                    gcnt--;
+                    if (gcnt == 0) {
+                        bot.channels.get('644812476382445569').send('**🎉 遊戲結束 狼人獲勝 🎉**');
+                        return;
+                    }
                 }
                 knightstatus = 1;
             }
