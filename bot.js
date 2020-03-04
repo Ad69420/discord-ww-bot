@@ -1248,4 +1248,4 @@ bot.on('raw', async event => {
         return;
     }
 });
-bot.login('NjUzOTY4ODg1NzIwMjg1MjA0.XkTppQ._C_WYVGyhO9EXtfQzYqaLmsQ_P4');
+bot.login(""); //insert your bot token inside the quotation marks
