@@ -435,6 +435,7 @@ bot.on('message', (message) => {
         } 
         else {
            message.reply(' 🚫 Access denied.');
+           return;
         }
     }
     else if (message.content == '/day' && status == 1) {
@@ -457,6 +458,7 @@ bot.on('message', (message) => {
         }
         else {
            message.reply(' 🚫 Access denied.');
+           return;
         }
         if (dead[0] == -1 && dead[1] == -1) {
             bot.channels.get('644812476382445569').send('--------------------------------------------------------\n<@&644797819169013761> <@&644797887498158081> <@&644797911733108737> <@&644797954632187935> <@&644797983333810177> <@&644797999242805249> <@&644798029068632074> <@&644798045862756352> <@&644798059473141782> <@&644798078217486336> <@&644877216752205825> <@&644890233279873024> \n昨晚是平安夜');
@@ -552,10 +554,12 @@ bot.on('message', (message) => {
         }
         else {
            message.reply(' 🚫 Access denied.');
+           return;
         }
     }
     else if (message.content == '/endvote' && status == 1) {
-        if (votebool == 0 || endvotebool == 1) {
+        let MC = message.guild.roles.find(role => role.name === "MC");
+        if (votebool == 0 || endvotebool == 1 || !message.member.roles.has(MC.id)) {
             message.reply(' 🚫 Access denied.');
             return;
         }
@@ -680,12 +684,12 @@ bot.on('message', (message) => {
         vote = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], votei = [];
     }
     else if (message.content == '/revote' && status == 1) {
-        if (endvotebool == 0 || revotebool == 1 || votebool == 0) {
+        let MC = message.guild.roles.find(role => role.name === "MC");
+        if (endvotebool == 0 || revotebool == 1 || votebool == 0 || !message.member.roles.has(MC.id)) {
             message.reply(' 🚫 Access denied.');
             return;
         }
         revotebool = 1;
-        let MC = message.guild.roles.find(role => role.name === "MC");
         if (message.member.roles.has(MC.id)) {
             for (var i = 1; i <= players; i++) {
                 if (vlist.includes(i)) {
@@ -709,10 +713,12 @@ bot.on('message', (message) => {
         }
         else {
            message.reply(' 🚫 Access denied.');
+           return;
         }
     }
     else if (message.content == '/endrevote' && status == 1) {
-        if (revotebool == 0 || votebool == 0 || endvotebool == 0 || endrevotebool == 1) {
+        let MC = message.guild.roles.find(role => role.name === "MC");
+        if (revotebool == 0 || votebool == 0 || endvotebool == 0 || endrevotebool == 1 || !message.member.roles.has(MC.id)) {
             message.reply(' 🚫 Access denied.');
             return;
         }
@@ -846,6 +852,7 @@ bot.on('message', (message) => {
         }
         else {
            message.reply(' 🚫 Access denied.');
+           return;
         }
     }
     else if (message.content == '/ping'  && status == 1) {
@@ -917,6 +924,7 @@ bot.on('message', (message) => {
         if (message.member.id == '653535759508439051' || message.member.id == '677378738228559873') return;
         if (message.channel.id != seerchannel || checkstatus == 0 || day == 1) {
             message.reply(' 🚫 Access denied.');
+            return;
         }
         else {
             if (message.content.substr(7, message.content.length) < 1) {
@@ -945,6 +953,7 @@ bot.on('message', (message) => {
         if (message.member.id == '653535759508439051' || message.member.id == '677378738228559873') return;
         if (knightstatus == 1 || day == 0 || !message.member.roles.has(convert2(knight))) {
             message.reply(' 🚫 Access denied.');
+            return;
         }
         else {
             bot.channels.get('644812476382445569').send('<@&'+convert2(knight)+'> ⚔️ 啟動騎士技能 選擇你要查驗的對象');
@@ -972,6 +981,7 @@ bot.on('message', (message) => {
         isV = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
         isW = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
         wcnt = 0, vcnt = 0, gcnt = 0;
+        votebool = 0, revotebool = 0, endvotebool = 0, endrevotebool = 0;
     }
     else if (message.content == '/togglepoison' && status == 1) {
         if (message.member.id == '653535759508439051' || message.member.id == '677378738228559873') return;
