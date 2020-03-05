@@ -893,6 +893,9 @@ bot.on('message', (message) => {
                     }); 
                 }
                 else if (kill == witch && daycnt > 0 && poison == 0) {
+                    bot.channels.get(witchchannel).send('昨晚**你**被殺死了，你**不能自救**。'); 
+                }
+                else if (kill == witch && daycnt > 0 && poison == 0) {
                     bot.channels.get(witchchannel).send('昨晚**你**被殺死了，你**不能自救**。');
                 }
             }
@@ -968,6 +971,7 @@ bot.on('message', (message) => {
         isG = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
         isV = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
         isW = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+        wcnt = 0, vcnt = 0, gcnt = 0;
     }
     else if (message.content == '/togglepoison' && status == 1) {
         if (message.member.id == '653535759508439051' || message.member.id == '677378738228559873') return;
@@ -1048,6 +1052,9 @@ bot.on('raw', async event => {
                             await message.react('❌');
                         }); 
                     }
+                }
+                else if (emojiKey == '❎' && userr.id != '653968885720285204' && userr.id != '677378738228559873' && poison == 0) {
+                    channelr.fetchMessage(msgid).then(msg => msg.delete());
                 }
             }
         }
