@@ -1272,4 +1272,4 @@ bot.on('raw', async event => {
         return;
     }
 });
-bot.login('NjUzOTY4ODg1NzIwMjg1MjA0.Xl97pA.62fLLPdtbK1cX8yA2pvohcTN6Ew');
+bot.login('');//insert your bot token inside ''
