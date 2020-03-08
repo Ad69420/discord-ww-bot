@@ -121,12 +121,12 @@ bot.on('message', (message) => {
         .catch(console.error);
     }
     else if (message.content == '/night' && status == 1) {
-        day = 0;
-        checkstatus = 1;
-        cankill = 1;
-        dead = [-1, -1, -1];
         let allowedRole = message.guild.roles.find(role => role.name === "MC");
         if (message.member.roles.has(allowedRole.id)) {
+            day = 0;
+            checkstatus = 1;
+            cankill = 1;
+            dead = [-1, -1, -1];
             let channel = message.member.voiceChannel;
             if (channel == undefined) {
                 message.reply('🚫 You have not joined a VC yet.');
@@ -439,15 +439,15 @@ bot.on('message', (message) => {
         }
     }
     else if (message.content == '/day' && status == 1) {
-        day = 1;
-        daycnt++;
-        votebool = 0;
-        endvotebool = 0;
-        revotebool = 0;
-        endrevotebool = 0;
         let MC = message.guild.roles.find(role => role.name === "MC");
         let dee = message.guild.roles.find(role => role.name === "Dead");
         if (message.member.roles.has(MC.id)) {
+            day = 1;
+            daycnt++;
+            votebool = 0;
+            endvotebool = 0;
+            revotebool = 0;
+            endrevotebool = 0;
             let channel = message.member.voiceChannel;
             for (let member of channel.members) {
                 if (!member[1].roles.has(dee.id)) {
@@ -532,9 +532,9 @@ bot.on('message', (message) => {
             message.reply(' 🚫 Access denied.');
             return;
         }
-        votebool = 1;
         let MC = message.guild.roles.find(role => role.name === "MC");
         if (message.member.roles.has(MC.id)) {
+            votebool = 1;
             for (var i = 1; i <= players; i++) {
                 if (idiotstatus == 1 && i == idiot) {
                     bot.channels.get(convert4(i)).send('🚫你不能投票');
@@ -950,8 +950,9 @@ bot.on('message', (message) => {
         }
     }
     else if (message.content == '/knight' && status == 1) {
+        let MC = message.guild.roles.find(role => role.name === "MC");
         if (message.member.id == '653535759508439051' || message.member.id == '677378738228559873') return;
-        if (knightstatus == 1 || day == 0 || !message.member.roles.has(convert2(knight))) {
+        if (knightstatus == 1 || day == 0 || !message.member.roles.has(convert2(knight)) || !message.member.roles.has(MC.id)) {
             message.reply(' 🚫 Access denied.');
             return;
         }
@@ -967,21 +968,27 @@ bot.on('message', (message) => {
         }
     }
     else if (message.content.includes('!endgame') && status == 1) {
-        save = 1;
-        poison = 1;
-        checkstatus = 1;
-        day = 0;
-        daycnt = 0;
-        wolves = [];
-        vlist = [];
-        idiotstatus = 0;
-        knightstaus = 0;
-        isDead = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-        isG = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-        isV = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
-        isW = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-        wcnt = 0, vcnt = 0, gcnt = 0;
-        votebool = 0, revotebool = 0, endvotebool = 0, endrevotebool = 0;
+        let MC = message.guild.roles.find(role => role.name === "MC");
+        if (!message.member.roles.has(MC.id)) {
+            save = 1;
+            poison = 1;
+            checkstatus = 1;
+            day = 0;
+            daycnt = 0;
+            wolves = [];
+            vlist = [];
+            idiotstatus = 0;
+            knightstaus = 0;
+            isDead = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+            isG = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+            isV = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
+            isW = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+            wcnt = 0, vcnt = 0, gcnt = 0;
+            votebool = 0, revotebool = 0, endvotebool = 0, endrevotebool = 0;
+        }
+        else {
+            message.reply('🚫 Access denied.');
+        }
     }
     else if (message.content == '/togglepoison' && status == 1) {
         if (message.member.id == '653535759508439051' || message.member.id == '677378738228559873') return;
@@ -1265,4 +1272,4 @@ bot.on('raw', async event => {
         return;
     }
 });
-bot.login(""); //insert your bot token inside the quotation marks
+bot.login('NjUzOTY4ODg1NzIwMjg1MjA0.Xl97pA.62fLLPdtbK1cX8yA2pvohcTN6Ew');
